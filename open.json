@@ -1,0 +1,802 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Vero GNRE",
+    "description": "# Introdução\nA Api Vero permite que você emita ou consulte documentos fiscais (NFe, NFSe, CTe, CTeOS, MDFe) a partir do seu sistema, seja qual for a tecnologia que ele utilize através da geração de dados em um formato simplificado, sem a necessidade de gerar a assinatura digital destes documentos ou de se comunicar diretamente com os orgãos governamentais competentes.\nToda a comunicação é realizada utilizando o padrão REST.\n\nAtravés desta documentação será possível a integração com a API Vero, caso tenha dúvidas ou dificuldades para utilizar esta documentação, entre em contato conosco através do email suporte@veroit.com.br\n\n# Visão Geral\nA emissão de documentos é realizada de forma assíncrona\n\nVocê envia pela API os dados do documento\nA API faz uma primeira validação do formato dos dados. Se houver alguma inconsistência, é devolvida uma mensagem de erro. Se estiver tudo ok, o documento é aceito e será retornado um id único para o documento. Neste caso, ele irá para uma fila onde será processado.\nSua aplicação deverá fazer uma nova consulta para verificar o status do processamento fornecendo o id do documento para consulta.\nA API irá informar o status do documento( em processamento, autorizado, erro e etc). Neste último caso informa a mensagem de erro ou os dados do documento gerado caso o documento tenha sido autorizado\nCaso o documento ainda esteja em processamento, sua aplicação deverá realizar uma nova consulta em 6 segundos (serão permitidas 10 consultas de status por documento em um intervalo de 60 segundos)\n\n\n\n# Autenticação\nA autenticação é feita através de um token. Ao habilitar a API para sua empresa forneceremos uma string secreta e única que será usada para efetuar todas as operações.\nPara autenticar, você deve enviar o parametro \"Access-Token\" no header da comunicação, contendo o token fornecido. \n",
+    "contact": {},
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.dfe.to/v1",
+      "variables": {}
+    },
+    {
+      "url": "http://api.dfe.to/v1",
+      "variables": {}
+    }
+  ],
+  "paths": {
+    "/gnre": {
+      "post": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Envia",
+        "operationId": "Envia",
+        "parameters": [
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnviaRequest"
+              },
+              "example": {
+                "resp_recolhimento": "1",
+                "emitente_cnpj": "XXXXXX51000143",
+                "emitente_ie": "XXXXXX571118",
+                "destinatario_cnpj_cpf": "XXXXXX51188002",
+                "destinatario_ie": "XXXXXX4863885",
+                "destinatario_nome": "XXX COMERCIO ALIMENTOS S.A",
+                "destinatario_endereco": "RUA XXX O999",
+                "destinatario_cep": "37026280",
+                "destinatario_ibge": "3170701",
+                "doc_chave": "352206XXXXXX11000729550070006695131044612266",
+                "doc_data_emissao": "22/06/2022",
+                "doc_valor": "173.48",
+                "produto": "00",
+                "guia": "DAE",
+                "vencimento": "04/07/2022",
+                "receita": [
+                  {
+                    "codigo": "3137",
+                    "valor": "173.48"
+                  }
+                ],
+                "infcpl": "Chave de acesso da NFe: 352206XXXXXX11000729550070006695131044612266",
+                "destinatario_codigo": "391104",
+                "pagador_codigo": "XXXXXX51000143",
+                "rota": "123",
+                "conta_codigo": "0f02f996-1446-40c3-bd82-e17f2XXXXXX"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "https://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Lista Processados",
+        "operationId": "ListaProcessados",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      }
+    },
+    "/gnre/xmlnfe": {
+      "post": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Envia XML NFe",
+        "operationId": "EnviaXMLNFe",
+        "parameters": [
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnviaXMLNFeRequest"
+              },
+              "example": {
+                "base64": "XXXXXXXXXXX8300022365500100003143915905535XX"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      }
+    },
+    "/gnre/{id}": {
+      "get": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Lista por Id",
+        "operationId": "ListaporId",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Atualiza Status Gnre",
+        "operationId": "AtualizaStatusGnre",
+        "parameters": [
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizaStatusGnreRequest"
+              },
+              "example": {
+                "statusleitura": "2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      }
+    },
+    "/gnre/chave/{chave}": {
+      "get": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Lista por Chave",
+        "operationId": "ListaporChave",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          },
+          {
+            "name": "chave",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      }
+    },
+    "/gnre/pagamento": {
+      "get": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Lista Arquivo Lote Bancário",
+        "operationId": "ListaArquivoLoteBancário",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Envia Retorno Bancário",
+        "operationId": "EnviaRetornoBancário",
+        "parameters": [
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnviaRetornoBancrioRequest"
+              },
+              "example": {
+                "base64": "XXXXXXXXXXX8300022365500100003143915905535XX"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      }
+    },
+    "/gnre/pagamento/{id}": {
+      "get": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Baixa Arquivo Lote Bancário",
+        "operationId": "BaixaArquivoLoteBancário",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Métodos"
+        ],
+        "summary": "Atualiza Status Arquivo Bancário",
+        "operationId": "AtualizaStatusArquivoBancário",
+        "parameters": [
+          {
+            "name": "Access-Token",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "{{access-token}}"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizaStatusArquivoBancrioRequest"
+              },
+              "example": {
+                "statusleitura": "2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false,
+        "security": [],
+        "servers": [
+          {
+            "url": "http://api.dfe.to/v1",
+            "variables": {}
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EnviaRequest": {
+        "title": "EnviaRequest",
+        "required": [
+          "resp_recolhimento",
+          "emitente_cnpj",
+          "emitente_ie",
+          "destinatario_cnpj_cpf",
+          "destinatario_ie",
+          "destinatario_nome",
+          "destinatario_endereco",
+          "destinatario_cep",
+          "destinatario_ibge",
+          "doc_chave",
+          "doc_data_emissao",
+          "doc_valor",
+          "produto",
+          "guia",
+          "vencimento",
+          "receita",
+          "infcpl",
+          "destinatario_codigo",
+          "pagador_codigo",
+          "rota",
+          "conta_codigo"
+        ],
+        "type": "object",
+        "properties": {
+          "resp_recolhimento": {
+            "type": "string"
+          },
+          "emitente_cnpj": {
+            "type": "string"
+          },
+          "emitente_ie": {
+            "type": "string"
+          },
+          "destinatario_cnpj_cpf": {
+            "type": "string"
+          },
+          "destinatario_ie": {
+            "type": "string"
+          },
+          "destinatario_nome": {
+            "type": "string"
+          },
+          "destinatario_endereco": {
+            "type": "string"
+          },
+          "destinatario_cep": {
+            "type": "string"
+          },
+          "destinatario_ibge": {
+            "type": "string"
+          },
+          "doc_chave": {
+            "type": "string"
+          },
+          "doc_data_emissao": {
+            "type": "string"
+          },
+          "doc_valor": {
+            "type": "string"
+          },
+          "produto": {
+            "type": "string"
+          },
+          "guia": {
+            "type": "string"
+          },
+          "vencimento": {
+            "type": "string"
+          },
+          "receita": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Receitum"
+            },
+            "description": ""
+          },
+          "infcpl": {
+            "type": "string"
+          },
+          "destinatario_codigo": {
+            "type": "string"
+          },
+          "pagador_codigo": {
+            "type": "string"
+          },
+          "rota": {
+            "type": "string"
+          },
+          "conta_codigo": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "resp_recolhimento": "1",
+          "emitente_cnpj": "XXXXXX51000143",
+          "emitente_ie": "XXXXXX571118",
+          "destinatario_cnpj_cpf": "XXXXXX51188002",
+          "destinatario_ie": "XXXXXX4863885",
+          "destinatario_nome": "XXX COMERCIO ALIMENTOS S.A",
+          "destinatario_endereco": "RUA XXX O999",
+          "destinatario_cep": "37026280",
+          "destinatario_ibge": "3170701",
+          "doc_chave": "352206XXXXXX11000729550070006695131044612266",
+          "doc_data_emissao": "22/06/2022",
+          "doc_valor": "173.48",
+          "produto": "00",
+          "guia": "DAE",
+          "vencimento": "04/07/2022",
+          "receita": [
+            {
+              "codigo": "3137",
+              "valor": "173.48"
+            }
+          ],
+          "infcpl": "Chave de acesso da NFe: 352206XXXXXX11000729550070006695131044612266",
+          "destinatario_codigo": "391104",
+          "pagador_codigo": "XXXXXX51000143",
+          "rota": "123",
+          "conta_codigo": "0f02f996-1446-40c3-bd82-e17f2XXXXXX"
+        }
+      },
+      "Receitum": {
+        "title": "Receitum",
+        "required": [
+          "codigo",
+          "valor"
+        ],
+        "type": "object",
+        "properties": {
+          "codigo": {
+            "type": "string"
+          },
+          "valor": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "codigo": "3137",
+          "valor": "173.48"
+        }
+      },
+      "EnviaXMLNFeRequest": {
+        "title": "EnviaXMLNFeRequest",
+        "required": [
+          "base64"
+        ],
+        "type": "object",
+        "properties": {
+          "base64": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "base64": "XXXXXXXXXXX8300022365500100003143915905535XX"
+        }
+      },
+      "AtualizaStatusGnreRequest": {
+        "title": "AtualizaStatusGnreRequest",
+        "required": [
+          "statusleitura"
+        ],
+        "type": "object",
+        "properties": {
+          "statusleitura": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "statusleitura": "2"
+        }
+      },
+      "AtualizaStatusArquivoBancrioRequest": {
+        "title": "AtualizaStatusArquivoBancrioRequest",
+        "required": [
+          "statusleitura"
+        ],
+        "type": "object",
+        "properties": {
+          "statusleitura": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "statusleitura": "2"
+        }
+      },
+      "EnviaRetornoBancrioRequest": {
+        "title": "EnviaRetornoBancrioRequest",
+        "required": [
+          "base64"
+        ],
+        "type": "object",
+        "properties": {
+          "base64": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "base64": "XXXXXXXXXXX8300022365500100003143915905535XX"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Métodos",
+      "description": ""
+    }
+  ]
+}
